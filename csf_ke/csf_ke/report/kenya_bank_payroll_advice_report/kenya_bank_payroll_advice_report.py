@@ -7,7 +7,8 @@ from frappe import _
 
 def execute(filters=None):
 	
-	company_currency = erpnext.get_company_currency(filters.get("company"))
+	company_currency = filters.get("currency")#erpnext.get_company_currency(filters.get("company"))
+	
 	columns = get_columns()
 	data = get_data(filters,company_currency)
 
@@ -78,22 +79,28 @@ def get_data(filters,company_currency):
   
 	query= get_conditions(query, filters, company_currency, salary_slip_doc)
 	data= query.run(as_dict=True) 
+
 	return data
 
 def get_conditions(query, filters, company_currency, salary_slip_doc):
-    doc_status = {"Draft": 0, "Submitted": 1, "Cancelled": 2}
-    
-    for filter_key, filter_value in filters.items():
-        if filter_key == "from_date":
-            query = query.where(salary_slip_doc.start_date == filter_value)
-        elif filter_key == "to_date":
-            query = query.where(salary_slip_doc.end_date == filter_value)
-        elif filter_key == "company":
-            query = query.where(salary_slip_doc.company == filter_value)
-        elif filter_key =="bank_name":
-            query = query.where(salary_slip_doc.bank_name == filter_value)
-        elif filter_key == "currency" and filter_value != company_currency:
-            query = query.where(salary_slip_doc.currency == filter_value)
-        elif filter_key == "docstatus":
-            query = query.where(salary_slip_doc.docstatus == doc_status.get(filter_value, 0))
-    return query
+	doc_status = {"Draft": 0, "Submitted": 1, "Cancelled": 2}
+	
+	for filter_key, filter_value in filters.items():
+		if filter_key == "from_date":
+			query = query.where(salary_slip_doc.start_date == filter_value)
+   
+		elif filter_key == "to_date":
+			query = query.where(salary_slip_doc.end_date == filter_value)
+   
+		elif filter_key == "company":
+			query = query.where(salary_slip_doc.company == filter_value)
+   
+		elif filter_key =="bank_name":
+			query = query.where(salary_slip_doc.bank_name == filter_value)
+			
+		elif filter_key == "currency" and company_currency != filter_value:
+			query = query.where(salary_slip_doc.currency == filter_value)
+			
+		elif filter_key == "docstatus":
+			query = query.where(salary_slip_doc.docstatus == doc_status.get(filter_value, 0))
+	return query

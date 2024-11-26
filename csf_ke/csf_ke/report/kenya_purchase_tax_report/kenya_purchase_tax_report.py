@@ -113,6 +113,7 @@ class KenyaPurchaseTaxReport(object):
 			purchase_invoices_query = purchase_invoices_query.where(purchase_invoice_.posting_date >= from_date)
 		if to_date:
 			purchase_invoices_query = purchase_invoices_query.where(purchase_invoice_.posting_date <= to_date)
+		purchase_invoices_query=purchase_invoices_query.where(purchase_invoice_.docstatus == 1)
 
 		purchase_invoices = purchase_invoices_query.run(as_dict=True)
 		return purchase_invoices
